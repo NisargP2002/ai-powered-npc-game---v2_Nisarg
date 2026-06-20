@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff3bd1785f9314b42a084e2daf6a5890, type: 3}
+  m_Name: APIConfig
+  m_EditorClassIdentifier: 
+  groqApiKey: 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
+  groqModel: llama-3.3-70b-versatile
+  groqEndpoint: https://api.groq.com/openai/v1/chat/completions
+  maxTokens: 450
