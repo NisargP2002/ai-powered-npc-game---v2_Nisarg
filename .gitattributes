@@ -1,10 +1,10 @@
 # Unity Scenes, Prefabs & Assets
-*.unity filter=lfs diff=lfs merge=lfs binary
+*.unity filter=lfs diff=lfs merge=lfs -text
 # *.prefab filter=lfs diff=lfs merge=lfs binary
-*.asset filter=lfs diff=lfs merge=lfs
+*.asset filter=lfs diff=lfs merge=lfs -text
 # Textures & Images
-*.png filter=lfs diff=lfs merge=lfs binary
-*.jpg filter=lfs diff=lfs merge=lfs binary
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
 *.jpeg filter=lfs diff=lfs merge=lfs binary
 *.tga filter=lfs diff=lfs merge=lfs binary
 *.psd filter=lfs diff=lfs merge=lfs binary
@@ -14,8 +14,8 @@
 *.svg filter=lfs diff=lfs merge=lfs
 *.hdr filter=lfs diff=lfs merge=lfs binary
 # Audio files
-*.wav filter=lfs diff=lfs merge=lfs binary
-*.mp3 filter=lfs diff=lfs merge=lfs binary
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
 *.ogg filter=lfs diff=lfs merge=lfs binary
 *.flac filter=lfs diff=lfs merge=lfs binary
 *.aiff filter=lfs diff=lfs merge=lfs binary
@@ -27,7 +27,7 @@
 *.webm filter=lfs diff=lfs merge=lfs binary
 *.mkv filter=lfs diff=lfs merge=lfs binary
 # 3D-Models & Meshes
-*.fbx filter=lfs diff=lfs merge=lfs binary
+*.fbx filter=lfs diff=lfs merge=lfs -text
 *.obj filter=lfs diff=lfs merge=lfs binary
 *.blend filter=lfs diff=lfs merge=lfs binary
 *.dae filter=lfs diff=lfs merge=lfs binary
@@ -35,7 +35,7 @@
 *.cubemap filter=lfs diff=lfs merge=lfs binary
 # Animations & Motion-Capture files
 *.anim filter=lfs diff=lfs merge=lfs
-*.controller filter=lfs diff=lfs merge=lfs
+*.controller filter=lfs diff=lfs merge=lfs -text
 *.overrideController filter=lfs diff=lfs merge=lfs
 *.rig filter=lfs diff=lfs merge=lfs
 # Physics und Simulation files
@@ -82,4 +82,5 @@
 #PointClouds
 *.ptx filter=lfs diff=lfs merge=lfs binary
 *.prefab filter=lfs diff=lfs merge=lfs -text
+*.mat filter=lfs diff=lfs merge=lfs -text
 * !text !filter !merge !diff

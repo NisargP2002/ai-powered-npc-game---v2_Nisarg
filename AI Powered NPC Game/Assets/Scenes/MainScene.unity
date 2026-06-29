@@ -181,6 +181,11 @@ MonoBehaviour:
   worldYOffset: 3.2
   bobSpeed: 1.5
   bobAmount: 8
+  mainCamera: {fileID: 0}
+  lastEmotion: 4
+  isThinking: 0
+  dialogueOpen: 0
+  pulseTimer: 0
 --- !u!114 &11719604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5457,7 +5462,14 @@ MonoBehaviour:
   bubblePanel: {fileID: 725378937}
   bubbleIconImage: {fileID: 1837485897}
   labelText: {fileID: 1978921173}
-  heartSprite: {fileID: 21300000, guid: 602d7af576b410f4e914a45c0f7e9a59, type: 3}
+  hostileSprite: {fileID: 21300000, guid: 3fcba67a485ed4850ad4f7134b5441f3, type: 3}
+  angrySprite: {fileID: -1624095317, guid: f6dfcf977474ff74094ecf05ff9db416, type: 3}
+  suspiciousSprite: {fileID: 21300000, guid: 493675a81d7274968b96bd4fbbb91b8e, type: 3}
+  sadSprite: {fileID: 21300000, guid: 51c0df0963207454c8efd5db8a91f138, type: 3}
+  neutralSprite: {fileID: 21300000, guid: 055e66d9bf1920945ba96f7fcd6078d8, type: 3}
+  curiousSprite: {fileID: 21300000, guid: e0e17c8415e204f42b7b987a36eece6f, type: 3}
+  warmSprite: {fileID: 21300000, guid: 602d7af576b410f4e914a45c0f7e9a59, type: 3}
+  gratefulSprite: {fileID: 21300000, guid: 2607b5536c5244661aa35a16fec01e1b, type: 3}
   bobSpeed: 1.4
   bobHeight: 0.06
 --- !u!1 &2062831367
@@ -6322,7 +6334,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 9069313763945682195, guid: e6086e6183e1244c7a7f443122201387, type: 3}
-      insertIndex: -1
+      insertIndex: 0
       addedObject: {fileID: 2049008393}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5501221248538774398, guid: e6086e6183e1244c7a7f443122201387, type: 3}
@@ -6380,12 +6392,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogueUI: {fileID: 605286672}
-  aiHandler: {fileID: 4819487406029851751}
   npcPatrol: {fileID: 4819487406029851744}
   npcStop: {fileID: 4819487406029851743}
   playerInteraction: {fileID: 7685886781491902951}
   emotionSystem: {fileID: 4819487406029851750}
-  emotionIcon: {fileID: 11719603}
+  apiKey: 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
+  gameOverCanvas: {fileID: 0}
 --- !u!114 &4819487406029851750
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6400,6 +6412,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trustScore: 0
   currentEmotion: 0
+  emotionHistory: []
+  trustMomentum: 0
+  consecutiveNegative: 0
+  attackThreshold: 4
 --- !u!114 &4819487406029851751
 MonoBehaviour:
   m_ObjectHideFlags: 0

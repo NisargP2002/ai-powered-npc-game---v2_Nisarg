@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Attached to: Eolindra
-// Manages the conversation: opening/closing dialogue, building prompts,
-// applying AI results (trust, emotion), and triggering the ending.
 public class DialogueManager : MonoBehaviour
 {
     [Header("References -- assign all in Inspector")]
@@ -14,18 +11,33 @@ public class DialogueManager : MonoBehaviour
     public NPCStop npcStop;
     public PlayerInteraction playerInteraction;
     public NPCEmotionSystem emotionSystem;
-    public FloatingEmotionIcon emotionIcon;  // drag FloatingHeart here
+    public FloatingEmotionIcon emotionIcon;
 
-    // Stores the last 8 lines of conversation for memory context
+    [Header("Game Over UI")]
+    public GameObject gameOverCanvas;
+
     private List<string> memoryLines = new List<string>();
     private const int MAX_MEMORY = 8;
-
-    // Prevents the ending from triggering more than once
     private bool endingStarted = false;
+    private bool gameOverTriggered = false;
 
-    // ─────────────────────────────────────────────────────────────
-    // PUBLIC -- called by PlayerInteraction and UI buttons
-    // ─────────────────────────────────────────────────────────────
+    void Start()
+    {
+        if (emotionSystem != null)
+            emotionSystem.OnAttackTriggered += TriggerGameOver;
+
+        if (gameOverCanvas != null)
+            gameOverCanvas.SetActive(false);
+
+        // Hide icon at start
+        if (emotionIcon != null) emotionIcon.HideIcon();
+    }
+
+    void OnDestroy()
+    {
+        if (emotionSystem != null)
+            emotionSystem.OnAttackTriggered -= TriggerGameOver;
+    }
 
     public void OpenDialogue()
     {
@@ -58,9 +70,9 @@ public class DialogueManager : MonoBehaviour
         if (playerInteraction != null) playerInteraction.EndInteraction();
     }
 
-    // Called by DialogueUIController when player clicks Send or presses Enter
     public void OnPlayerSubmitMessage(string playerMessage)
     {
+        if (gameOverTriggered || endingStarted) return;
         playerMessage = playerMessage.Trim();
         if (string.IsNullOrEmpty(playerMessage)) return;
 
@@ -80,32 +92,22 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // PRIVATE -- internal logic
-    // ─────────────────────────────────────────────────────────────
-
-    // Called by AIRequestHandler when the Groq response arrives
     void OnAIResponse(AIResponse aiResult)
     {
-        // 1. Show Eolindra's reply
         if (dialogueUI != null)
             dialogueUI.DisplayNPCText(aiResult.dialogueText);
 
-        // 2. Store in memory
         AddMemory("EOLINDRA: " + aiResult.dialogueText);
 
-        // 3. Apply trust and emotion -- both come FROM the LLM
         if (emotionSystem != null)
         {
             emotionSystem.ModifyTrust(aiResult.trustChange);
             emotionSystem.SetEmotionFromString(aiResult.emotion);
         }
 
-        // 4. Check if ending should trigger
         CheckForEnding();
     }
 
-    // Checks trust score after every response
     void CheckForEnding()
     {
         if (endingStarted) return;
@@ -118,15 +120,12 @@ public class DialogueManager : MonoBehaviour
 
     IEnumerator TriggerEndingSequence()
     {
-        // Lock input so player cannot keep typing
         if (dialogueUI != null) dialogueUI.LockInput(true);
 
-        // Hide emotion icon during ending
         if (emotionIcon != null) emotionIcon.HideIcon();
 
         yield return new WaitForSeconds(1.5f);
 
-        // Pre-written final speech -- guaranteed to work during demo
         string finalSpeech =
             "I did not think anyone would come. Not after so long. " +
             "You have given me something I had forgotten existed. " +
@@ -139,13 +138,42 @@ public class DialogueManager : MonoBehaviour
 
         if (EndingManager.Instance != null)
             EndingManager.Instance.TriggerEnding();
-        else
-            Debug.LogWarning("[DialogueManager] EndingManager not found in scene.");
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // PROMPT BUILDING
-    // ─────────────────────────────────────────────────────────────
+    void TriggerGameOver()
+    {
+        if (gameOverTriggered) return;
+        gameOverTriggered = true;
+        StartCoroutine(GameOverSequence());
+    }
+
+    IEnumerator GameOverSequence()
+    {
+        if (dialogueUI != null)
+        {
+            dialogueUI.LockInput(true);
+            dialogueUI.DisplayNPCText(
+                "ENOUGH! You dare defile this sacred ground with your venom? " +
+                "The Ashwood does not forgive. And neither do I.");
+        }
+
+        if (emotionIcon != null) emotionIcon.HideIcon();
+
+        yield return new WaitForSeconds(2f);
+
+        if (npcStop != null)
+            npcStop.PlayAttack();
+
+        yield return new WaitForSeconds(1.5f);
+
+        if (dialogueUI != null) dialogueUI.Hide();
+
+        if (gameOverCanvas != null)
+            gameOverCanvas.SetActive(true);
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
 
     string BuildSystemPrompt()
     {
@@ -155,6 +183,10 @@ public class DialogueManager : MonoBehaviour
 
         string waystones = (WaystoneManager.Instance != null)
             ? WaystoneManager.Instance.GetWaystoneContext()
+            : "";
+
+        string emotionContext = (emotionSystem != null)
+            ? emotionSystem.GetFullEmotionContext()
             : "";
 
         string storyContext = GetStoryContext();
@@ -168,6 +200,7 @@ public class DialogueManager : MonoBehaviour
             "You have been alone for two centuries. " +
             "You speak in a formal, slightly old-fashioned way. " +
             "Your current emotional state: " + mood + ". " +
+            emotionContext +
             storyContext + " " +
             waystones +
             "\n\nYou MUST respond in valid JSON format only. No other text. No markdown. " +
@@ -183,15 +216,20 @@ public class DialogueManager : MonoBehaviour
             "Mildly positive (+5 to +14): polite, curious, respectful.\n" +
             "Neutral (0 to +4): small talk, simple questions.\n" +
             "Negative (-1 to -20): rude, dismissive, threatening, or mocking.\n" +
-            "\nRules for emotion -- choose based on what the player just said:\n" +
-            "warm:    player said something kind, empathetic, caring, or helpful. " +
-            "Even ONE kind sentence is enough to return warm. " +
-            "If the player expresses care for you or the forest, return warm.\n" +
-            "sad:     player mentioned loneliness, grief, loss, or things that were destroyed.\n" +
-            "angry:   player was rude, dismissive, impatient, or threatening.\n" +
-            "neutral: player asked a plain question with no emotional weight.\n" +
+            "\nRules for emotion -- choose EXACTLY one based on what the player just said:\n" +
+            "hostile:    player made death threats, wants to destroy the forest, extreme aggression.\n" +
+            "angry:      player was rude, dismissive, impatient, insulting, or threatening.\n" +
+            "suspicious: player seems untrustworthy, evasive, or has mixed intentions.\n" +
+            "sad:        player mentioned loneliness, grief, loss, or things that were destroyed.\n" +
+            "neutral:    player asked a plain question with no emotional weight.\n" +
+            "curious:    player is asking thoughtful questions, showing genuine interest.\n" +
+            "warm:       player said something kind, empathetic, caring, or helpful.\n" +
+            "grateful:   player showed deep understanding of Eolindra's loneliness or duty.\n" +
             "IMPORTANT: do not default to neutral out of caution. " +
-            "If the message has any warmth or kindness in it, return warm.\n" +
+            "If the message has any warmth or kindness, return warm. " +
+            "If deep empathy or understanding, return grateful. " +
+            "If hostile or threatening, return hostile or angry. " +
+            "Emotions must shift GRADUALLY. No jumping from hostile to warm.\n" +
             "Return raw JSON only. No markdown code blocks. No extra text.";
     }
 
@@ -205,7 +243,6 @@ public class DialogueManager : MonoBehaviour
         bool allStonesFound = (WaystoneManager.Instance != null)
             && WaystoneManager.Instance.AllFound();
 
-        // Stage 1 -- trust too low, Eolindra reveals nothing
         if (trust < 25f)
         {
             return
@@ -215,7 +252,6 @@ public class DialogueManager : MonoBehaviour
                 "or the Waystones yet. You watch them carefully.";
         }
 
-        // Stage 2 -- some trust, Eolindra hints at the Accord
         if (trust < 50f)
         {
             return
@@ -229,7 +265,6 @@ public class DialogueManager : MonoBehaviour
                 "what the druids started. Do not give explicit instructions yet.";
         }
 
-        // Stage 3 -- enough trust, Eolindra explicitly asks for help
         if (trust < 80f && !allStonesFound)
         {
             if (stonesFound == 0)
@@ -255,7 +290,6 @@ public class DialogueManager : MonoBehaviour
                 "You are emotional -- this has not happened in two centuries.";
         }
 
-        // Stage 4 -- all stones found, building to the ending
         if (allStonesFound && trust < 80f)
         {
             return
@@ -268,7 +302,6 @@ public class DialogueManager : MonoBehaviour
                 "You sense your long vigil is almost over.";
         }
 
-        // Stage 5 -- trust maxed, ending about to trigger
         return
             "The player has earned your complete trust. " +
             "You are at peace for the first time in two centuries. " +
