@@ -41,6 +41,7 @@ public class FloatingEmotionIcon : MonoBehaviour
     void Update()
     {
         if (!isVisible || eolindraTransform == null || mainCamera == null) return;
+        if (rectTransform == null || iconImage == null) return;
 
         FollowEolindra();
         Bob();
