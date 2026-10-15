@@ -16,6 +16,12 @@ public class WaystoneManager : MonoBehaviour
 
     void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
 
         // Set the counter to show 0 at the start of the game
@@ -25,7 +31,7 @@ public class WaystoneManager : MonoBehaviour
 
     public void WaystoneFound()
     {
-        activatedCount++;
+        activatedCount = Mathf.Min(activatedCount + 1, totalWaystones);
         Debug.Log("[Waystones] " + activatedCount + " / " + totalWaystones + " found");
 
         // Update the on-screen counter
