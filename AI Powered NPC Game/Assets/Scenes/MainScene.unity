@@ -166,7 +166,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 11719601}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 638a07d4bf9c8cf4980c5b9b3f7cfe6b, type: 3}
+  m_Script: {fileID: 11500000, guid: adae37fffc46c418ab9090cce18e5807, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   eolindraTransform: {fileID: 1687775279}
@@ -178,14 +178,13 @@ MonoBehaviour:
   spriteWarm: {fileID: 21300000, guid: 602d7af576b410f4e914a45c0f7e9a59, type: 3}
   spriteSad: {fileID: 21300000, guid: 51c0df0963207454c8efd5db8a91f138, type: 3}
   spriteAngry: {fileID: -479564137, guid: f6dfcf977474ff74094ecf05ff9db416, type: 3}
+  spriteHostile: {fileID: 21300000, guid: 3fcba67a485ed4850ad4f7134b5441f3, type: 3}
+  spriteSuspicious: {fileID: 21300000, guid: 493675a81d7274968b96bd4fbbb91b8e, type: 3}
+  spriteCurious: {fileID: 21300000, guid: e0e17c8415e204f42b7b987a36eece6f, type: 3}
+  spriteGrateful: {fileID: 21300000, guid: 2607b5536c5244661aa35a16fec01e1b, type: 3}
   worldYOffset: 3.2
   bobSpeed: 1.5
   bobAmount: 8
-  mainCamera: {fileID: 0}
-  lastEmotion: 4
-  isThinking: 0
-  dialogueOpen: 0
-  pulseTimer: 0
 --- !u!114 &11719604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6392,10 +6391,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogueUI: {fileID: 605286672}
+  aiHandler: {fileID: 4819487406029851751}
   npcPatrol: {fileID: 4819487406029851744}
   npcStop: {fileID: 4819487406029851743}
   playerInteraction: {fileID: 7685886781491902951}
   emotionSystem: {fileID: 4819487406029851750}
+  emotionIcon: {fileID: 11719603}
   gameOverCanvas: {fileID: 0}
 --- !u!114 &4819487406029851750
 MonoBehaviour:
@@ -6410,7 +6411,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trustScore: 0
-  currentEmotion: 0
+  currentEmotion: 2
   emotionHistory: []
   trustMomentum: 0
   consecutiveNegative: 0

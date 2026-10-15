@@ -113,6 +113,8 @@ public class DialogueManager : MonoBehaviour
         if (endingStarted) return;
         if (emotionSystem == null) return;
         if (emotionSystem.trustScore < 80f) return;
+        if (WaystoneManager.Instance == null) return;
+        if (!WaystoneManager.Instance.AllFound()) return;
 
         endingStarted = true;
         StartCoroutine(TriggerEndingSequence());
