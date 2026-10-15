@@ -6396,7 +6396,6 @@ MonoBehaviour:
   npcStop: {fileID: 4819487406029851743}
   playerInteraction: {fileID: 7685886781491902951}
   emotionSystem: {fileID: 4819487406029851750}
-  apiKey: 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
   gameOverCanvas: {fileID: 0}
 --- !u!114 &4819487406029851750
 MonoBehaviour:
