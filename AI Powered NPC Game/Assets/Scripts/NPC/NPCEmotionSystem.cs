@@ -80,7 +80,13 @@ public class NPCEmotionSystem : MonoBehaviour
 
     public void SetEmotion(EmotionState emotion)
     {
+        previousEmotion = currentEmotion;
         currentEmotion = emotion;
+        emotionHistory.Add(currentEmotion.ToString());
+        if (emotionHistory.Count > 20) emotionHistory.RemoveAt(0);
+
+        if (previousEmotion != currentEmotion && OnEmotionChanged != null)
+            OnEmotionChanged.Invoke(previousEmotion, currentEmotion);
     }
 
     public void SetEmotionFromString(string emotionString)
